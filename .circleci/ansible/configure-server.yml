@@ -21,7 +21,6 @@
       raw: test -e /user/bin/python3 || ( apt -y update && apt install -y python3)
       changed_when: false
 
-  # Get the environment variables from CircleCI and add to the EC2 instance
   environment:
     - TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION')}}"
     - TYPEORM_ENTITIES: "{{ lookup('env', 'TYPEORM_ENTITIES')}}"
@@ -34,5 +33,4 @@
     - TYPEORM_MIGRATIONS_DIR: "{{ lookup('env', 'TYPEORM_MIGRATIONS_DIR')}}"
 
   roles:
-    # Your code here
     - configure-server

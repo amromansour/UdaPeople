@@ -210,10 +210,9 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            apt-get install awscli -y
             npm install
             npm audit fix --force
-            # Run and save the migration output
+            apt-get install awscli -y
             npm run migrations > migrations_dump.txt
       - run:
           name: Send migration results to kvdb
