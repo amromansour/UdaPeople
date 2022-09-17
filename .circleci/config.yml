@@ -15,7 +15,7 @@ commands:
           command: |
             echo "Destroying environment: <<parameters.workflow_id>> "
             aws cloudformation delete-stack --stack-name udapeople-backend-prod-<<parameters.workflow_id>>
-            # aws s3 rm s3://udapeople-<<parameters.workflow_id>> --recursive
+            aws s3 rm s3://udapeople-<<parameters.workflow_id>> --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-prod-<<parameters.workflow_id>>
 
   revert-migrations:
@@ -38,7 +38,7 @@ commands:
                 npm run migration:revert
             fi
   install-ansible:
-    description: Install Ansible ona linux machine.
+    description: Install Ansible on a linux machine.
     steps:
       - run:
           name: Install Ansible
@@ -48,6 +48,39 @@ commands:
             sudo apt install software-properties-common
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible
+
+  install-nodejs:
+    description: Install node on a linux machine.
+    steps:
+      - run:
+          name: Install Node
+          # Add when this will run
+          command: |
+            sudo apt-get update && sudo apt-get upgrade
+          shell: |
+            curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash - && sudo apt-get install -y nodejs
+
+  install-awscli:
+    description: Install Ansible ona linux machine.
+    steps:
+      - run:
+          name: Install AWSCLI
+          # Add when this will run
+          command: |
+            sudo apt-get update && sudo apt-get upgrade
+            sudo apt-get install awscli -y
+
+  install-python:
+    description: Install Python ona linux machine.
+    steps:
+      - run:
+          name: Install Python
+          # Add when this will run
+          command: |
+            sudo apt-get update && sudo apt-get upgrade
+            sudo apt install software-properties-common
+            sudo apt install python3.8
+
 jobs:
   build-frontend:
     docker:
@@ -168,11 +201,6 @@ jobs:
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --output text --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} >> inventory.txt
             cat inventory.txt
-            # export BACKEND_IP=$(aws ec2 describe-instances \
-            # --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            # --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} \
-            # --output text)
-            # echo ${BACKEND_IP}
       - persist_to_workspace:
           root: ~/
           paths:
@@ -223,26 +251,44 @@ jobs:
       - destroy-environment
       - revert-migrations
 
-#   deploy-frontend:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#             export API_URL="http://${BACKEND_IP}:3030"
-#             echo "${API_URL}"
-#       - run:
-#           name: Deploy frontend objects
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+
+      - add_ssh_keys:
+          fingerprints:
+            - "0e:5e:4b:5d:bf:7d:d8:f3:d4:6c:5d:ae:34:42:c3:39"
+
+      - attach_workspace:
+          at: ~/
+
+      - install-nodejs
+      - install-awscli
+      - install-ansible
+
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} \
+            --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - destroy-environment
+      - revert-migrations
 
 #   deploy-backend:
 #     docker:
@@ -340,8 +386,8 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations]
       # - deploy-backend:
       #     requires: [run-migrations]
       # - smoke-test:
