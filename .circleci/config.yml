@@ -268,8 +268,8 @@ jobs:
       - attach_workspace:
           at: ~/
 
-      - install-nodejs
-      - install-awscli
+      # - install-nodejs
+      # - install-awscli
       - install-ansible
 
       - run:
