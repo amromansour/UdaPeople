@@ -54,17 +54,18 @@ commands:
       - run:
           name: Install Node
           command: |
-            sudo apt-get update && sudo apt-get upgrade
-            sudo apt-get install -y nodejs
+            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            sudo apt install -y nodejs
 
   install-awscli:
-    description: Install Ansible on a linux machine.
+    description: Install AWSCLI on a linux machine.
     steps:
       - run:
           name: Install AWSCLI
           command: |
-            sudo apt-get update && sudo apt-get upgrade
-            sudo apt-get install awscli -y
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
 
   install-python:
     description: Install Python on a linux machine.
