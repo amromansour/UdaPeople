@@ -42,7 +42,6 @@ commands:
     steps:
       - run:
           name: Install Ansible
-          # Add when this will run
           command: |
             sudo apt update
             sudo apt install software-properties-common
@@ -54,32 +53,37 @@ commands:
     steps:
       - run:
           name: Install Node
-          # Add when this will run
           command: |
             sudo apt-get update && sudo apt-get upgrade
           shell: |
             curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash - && sudo apt-get install -y nodejs
 
   install-awscli:
-    description: Install Ansible ona linux machine.
+    description: Install Ansible on a linux machine.
     steps:
       - run:
           name: Install AWSCLI
-          # Add when this will run
           command: |
             sudo apt-get update && sudo apt-get upgrade
             sudo apt-get install awscli -y
 
   install-python:
-    description: Install Python ona linux machine.
+    description: Install Python on a linux machine.
     steps:
       - run:
           name: Install Python
-          # Add when this will run
           command: |
             sudo apt-get update && sudo apt-get upgrade
             sudo apt install software-properties-common
             sudo apt install python3.8
+
+  install-tar:
+    description: Install Tar and Gzip on a linux machine.
+    steps:
+      - run:
+          name: Install Tar
+          command: |
+            yum install -y tar gzip
 
 jobs:
   build-frontend:
@@ -260,7 +264,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "0e:5e:4b:5d:bf:7d:d8:f3:d4:6c:5d:ae:34:42:c3:39"
-
+      - install-tar
       - attach_workspace:
           at: ~/
 
