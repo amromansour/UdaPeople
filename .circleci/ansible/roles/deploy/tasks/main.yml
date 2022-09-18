@@ -1,5 +1,32 @@
+- name: create backend dir
+  file:
+    path: ~/backend-application
+    state: directory
+
+- name: "Install zip utility."
+  apt:
+    name: ["zip", "unzip"]
+    state: latest
+    update_cache: yes
+
+- name: extract backend files
+  unarchive:
+    src: artifact.tar.gz
+    dest: ~/backend-application
+
+- name: "install pm2"
+  npm:
+    name: pm2
+    global: yes
+    production: yes
+    state: present
+
 - name: deploy node
   command: |
+    cd ~/backend-application
     npm install
+
+    cd ~/backend-application/dist
     pm2 stop default
-    pm2 start npm -- start
+    pm2 start main.js
+    # pm2 start npm -- start
