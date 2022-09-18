@@ -21,12 +21,18 @@
     production: yes
     state: present
 
-- name: deploy node
+- name: install node dep
   command: |
     cd ~/backend-application
     npm install
 
+- name: Exec node
+  command: |
     cd ~/backend-application/dist
     pm2 stop default
     pm2 start main.js
-    # pm2 start npm -- start
+    pm2 start npm -- start
+  register: exec_node
+- name: print msg
+  debug:
+    msg: "{{ exec_node.stdout_lines}}"
