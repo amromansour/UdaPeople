@@ -296,7 +296,7 @@ jobs:
 
   deploy-backend:
     docker:
-      - image: cimg/base:stable
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
 
@@ -307,7 +307,11 @@ jobs:
       - attach_workspace:
           at: ~/
 
-      - install-ansible
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update curl nodejs npm ansible zip
+            pip install awscli
       - run:
           name: Deploy backend
           command: |
