@@ -27,7 +27,7 @@
   #   pm2 start main.js
 
   command: |
-    cd ~/backend-application/dist
+    chdir ~/backend-application/dist
     pm2 stop default
     pm2 start main.js
   args:
