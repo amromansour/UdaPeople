@@ -25,10 +25,13 @@
     cd ~/backend-application/dist
     pm2 stop default
     pm2 start main.js
+
   register: exec_node
+
 - name: print msg
   debug:
     msg: "{{ exec_node.stdout_lines}}"
+
 - name: configure pm2 to start AAS
   become: true
   shell: |
