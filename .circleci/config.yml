@@ -429,7 +429,7 @@ jobs:
             echo Stack names: "${STACKS[@]}"
 
       - run:
-          name: Remove old stacks and files
+          name: Remove old stacks and files perm
           command: |
             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
