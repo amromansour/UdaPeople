@@ -426,14 +426,13 @@ jobs:
           command: |
             if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
             then
-              echo "--------------------Clean Confirmed----------------------------"
+              echo "--------------------Clean Confirmed-----------------------------"
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "udapeople-backend-prod-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "udapeople-frontend-prod-${OldWorkflowID}"
             else
-              echo "--------------------Cannot Clean up----------------------------"  
+              echo "--------------------Cannot Clean up------------------------------"  
             fi
-
 workflows:
   default:
     jobs:
