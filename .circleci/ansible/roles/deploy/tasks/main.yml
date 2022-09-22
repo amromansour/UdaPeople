@@ -21,10 +21,6 @@
     npm i
 
 - name: Exec node
-  # shell: |
-  #   cd ~/backend-application/dist
-  #   pm2 stop default
-  #   pm2 start main.js
 
   shell: |
     cd ~/backend-application/dist
